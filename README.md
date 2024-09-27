@@ -1,6 +1,6 @@
 # PDF Processor with OCR and Blurring
 
-This project is a Python-based utility for processing PDF files. It converts PDF pages to images, applies OCR (Optical Character Recognition) using [EasyOCR](https://github.com/JaidedAI/EasyOCR), and blurs sensitive text within bounding boxes. The output is a new processed PDF where sensitive information is obscured while retaining the visual layout of the original document.
+This project is a Python-based utility for processing PDF files. It converts PDF pages to images, applies OCR (Optical Character Recognition) using [EasyOCR](https://github.com/JaidedAI/EasyOCR), and blurs text within bounding boxes meant to redact text and leave diagrams for creating exercises from notes.
 
 ## Features
 - **PDF to Image Conversion**: Uses `pdf2image` to convert PDF pages into high-resolution images.
@@ -15,7 +15,7 @@ This project is a Python-based utility for processing PDF files. It converts PDF
 Before you begin, make sure you have Python 3.x installed on your system. Install the required Python packages by running:
 
 ```bash
-pip install streamlit pdf2image Pillow opencv-python-headless numpy easyocr reportlab
+pip install pdf2image Pillow opencv-python-headless numpy easyocr reportlab
 ```
 
 Additionally, make sure you have the following system dependencies:
