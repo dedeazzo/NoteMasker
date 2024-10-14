@@ -1,0 +1,7 @@
+Flask
+easyocr
+Pillow
+opencv-python-headless
+numpy
+reportlab
+pdf2image

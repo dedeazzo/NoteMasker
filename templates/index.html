@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #333;
+            position: relative; /* Added for positioning settings dropdown */
+        }
+
+        h1 {
+            color: #4285f4; /* Google blue */
+            margin-bottom: 20px;
+        }
+
+        /* Hamburger menu styles */
+        .hamburger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #4285f4; /* Google blue */
+            transition: color 0.3s;
+        }
+
+        .hamburger:hover {
+            color: #357ae8; /* Darker blue on hover */
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; /* Could be more or less, depending on screen size */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Settings form styles */
+        .settings label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .settings select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Styles for the drag-and-drop area */
+        .upload-area {
+            width: 100%;
+            max-width: 500px;
+            height: 200px;
+            border: 2px dashed #4285f4; /* Google blue */
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            color: #4285f4; /* Google blue */
+            transition: background-color 0.3s, color 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upload-area.dragover {
+            background-color: #e8f0fe; /* Light blue background on drag over */
+            color: #000; /* Darker text color */
+        }
+        
+        .upload-area p {
+            text-align: center;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        /* Download link styles */
+        #download-link {
+            display: none; /* Initially hide the download link */
+            margin-top: 20px;
+            font-size: 16px;
+            color: #4285f4; /* Google blue */
+        }
+        
+        #download-link a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Button styles */
+        .btn {
+            background-color: #4285f4; /* Google blue */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #357ae8; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Upload Your PDF or Image</h1>
+
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger-menu">&#9776;</div>
+
+    <!-- Modal for Settings -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Settings</h2>
+            <div class="settings">
+                <label for="batch_size">Batch Size:</label>
+                <select id="batch_size">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                </select>
+
+                <label for="num_workers">Num Workers:</label>
+                <select id="num_workers">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+
+                <label for="blur_radius">Blur Radius:</label>
+                <select id="blur_radius">
+                    <option value="30">30</option>
+                    <option value="45" selected>45</option>
+                    <option value="60">60</option>
+                </select>
+
+                <label for="corner_radius">Corner Radius:</label>
+                <select id="corner_radius">
+                    <option value="70">70</option>
+                    <option value="90" selected>90</option>
+                    <option value="110">110</option>
+                </select>
+
+                <label for="height_multiplier">Height Threshold Multiplier:</label>
+                <select id="height_multiplier">
+                    <option value="1.5">1.5</option>
+                    <option value="1.8" selected>1.8</option>
+                    <option value="2.0">2.0</option>
+                </select>
+
+                <label for="dpi_resolution">DPI Resolution:</label>
+                <select id="dpi_resolution">
+                    <option value="300">300</option>
+                    <option value="600" selected>600</option>
+                    <option value="1200">1200</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drag and Drop Area -->
+    <div id="upload-area" class="upload-area">
+        <p>Drag and drop a file here, or click to select one</p>
+    </div>
+
+    <!-- File Upload Form (Hidden) -->
+    <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data" style="display:none;">
+        <input type="file" name="file" id="file-input">
+    </form>
+
+    <!-- Download Link Placeholder -->
+    <div id="download-link">
+        <a id="download-anchor" href="" download>Download Processed File</a>
+    </div>
+
+    <button class="btn" id="file-upload-btn" style="display: none;" onclick="document.getElementById('file-input').click();">Select File</button>
+
+    <!-- JavaScript to handle drag-and-drop, file selection, and modal -->
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const form = document.getElementById('file-form');
+        const downloadLink = document.getElementById('download-link');
+        const downloadAnchor = document.getElementById('download-anchor');
+        const uploadBtn = document.getElementById('file-upload-btn');
+
+        // Modal functionality
+        const modal = document.getElementById("settingsModal");
+        const hamburgerMenu = document.getElementById("hamburger-menu");
+        const closeModal = document.getElementById("closeModal");
+
+        hamburgerMenu.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                submitForm(); // Automatically submit the form when file is dropped
+            }
+        });
+
+        // Allow file selection with a click on the area
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection from file input
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                submitForm(); // Automatically submit the form when a file is selected
+            }
+        });
+
+        // Function to submit the form and handle the response
+        function submitForm() {
+            const formData = new FormData(form);
+            
+            // Get settings values
+            formData.append('batch_size', document.getElementById('batch_size').value);
+            formData.append('num_workers', document.getElementById('num_workers').value);
+            formData.append('blur_radius', document.getElementById('blur_radius').value);
+            formData.append('corner_radius', document.getElementById('corner_radius').value);
+            formData.append('height_multiplier', document.getElementById('height_multiplier').value);
+            formData.append('dpi_resolution', document.getElementById('dpi_resolution').value);
+            
+            uploadArea.innerHTML = "<p>Uploading and processing your file...</p>"; // Inform the user
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                uploadArea.innerHTML = "<p>Drag and drop a file here, or click to select one</p>"; // Reset the message
+
+                if (data.filename) {
+                    showDownloadLink(data.filename);
+                } else {
+                    alert(data.message || "An error occurred.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the file.');
+            });
+        }
+
+        // Function to show the download link
+        function showDownloadLink(fileName) {
+            downloadAnchor.href = `/download/${fileName}`;
+            downloadLink.style.display = 'block'; // Show the download link
+            uploadArea.innerHTML += "<p>Your file has been processed successfully. Download it below.</p>";
+        }
+    </script>
+
+</body>
+</html>
